@@ -87,7 +87,7 @@ services:
       - /volume1/data:/data  # Changez selon votre volume
 ```
 
-3. **Trouvez vos PUID et PGID** (OBLIGATOIRE pour Synology)
+### 3. Trouver vos PUID et PGID (OBLIGATOIRE pour Synology)
 
    Sur votre Synology, en SSH :
    ```bash
@@ -107,7 +107,8 @@ services:
    
    **Guide détaillé Synology :** https://mariushosting.com/synology-find-uid-userid-and-gid-groupid-in-5-seconds/
 
-4. **🔐 Générer un secret TOTP (2FA)** :
+### 4. 🔐 Générer un secret TOTP (2FA)
+
 Pour activer la double authentification, vous devez fournir un **secret TOTP**.  
 Ce secret permet de générer les codes à 6 chiffres utilisés lors de la connexion.
 
@@ -134,7 +135,7 @@ environment:
 ### 🔵 Méthode 2 : Générer un secret sur Windows (PowerShell)
 
 ~~~powershell
--join ((1..64) | ForEach-Object { "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".ToCharArray() | Get-Random })
+$bytes = New-Object byte[] 32; (New-Object System.Security.Cryptography.RNGCryptoServiceProvider).GetBytes($bytes); $alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"; $output = ""; $buffer = 0; $bitsLeft = 0; foreach ($b in $bytes) { $buffer = ($buffer -shl 8) -bor $b; $bitsLeft += 8; while ($bitsLeft -ge 5) { $bitsLeft -= 5; $output += $alphabet[($buffer -shr $bitsLeft) -band 31]; } }; if ($bitsLeft -gt 0) { $output += $alphabet[($buffer -shl (5 - $bitsLeft)) -band 31]; }; $output
 ~~~
 
 1. Exécutez la commande  
@@ -164,6 +165,8 @@ Si vous préférez scanner un QR code, utilisez cette URL :
 ~~~text
 otpauth://totp/username?secret=VOTRE_SECRET_TOTP&issuer=hardlink-ui
 ~~~
+
+Modifier "username" par le Login que vous avez configurer !
 
 Générez ensuite un QR code avec un outil en ligne :
 
