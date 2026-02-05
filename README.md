@@ -10,6 +10,27 @@ Dupliquons sans perdre de place. 🚀
 
 ---
 
+## 📚 Sommaire
+
+- [📖 Présentation](#-présentation)
+- [🚀 Démarrage rapide](#-démarrage-rapide-débutants)
+  - [Prérequis](#1-prérequis)
+  - [Configuration docker-compose](#2-configuration-rapide-avec-docker-compose)
+  - [Trouver PUID/PGID](#3-trouvez-vos-puid-et-pgid-obligatoire-pour-synology)
+  - [Générer un secret TOTP](#-générer-un-secret-totp-2fa)
+- [✨ Fonctionnalités](#-fonctionnalités)
+- [📋 Prérequis](#-prérequis)
+- [🔧 Installation avancée](#-installation-avancée)
+- [⚙️ Configuration](#-configuration)
+- [🔒 Notes de sécurité](#-notes-de-sécurité)
+- [📱 Guide d’utilisation](#-guide-dutilisation)
+- [📱 Progressive Web App (PWA)](#-progressive-web-app-pwa)
+- [🛠️ Troubleshooting](#-troubleshooting)
+- [❓ FAQ](#-faq)
+- [📄 Licence](#-licence)
+- [🤝 Contribution](#-contribution)
+- [📞 Support](#-support)
+
 ## 📖 Présentation
 
 **hardlink-ui** est une interface web minimaliste et sécurisée permettant de créer, gérer et optimiser les hardlinks sur vos systèmes de fichiers Linux. L'application a été développée et testée sur **Synology DSM** - le support sur d'autres plateformes n'est pas garanti mais peut fonctionner.
@@ -86,15 +107,82 @@ services:
    
    **Guide détaillé Synology :** https://mariushosting.com/synology-find-uid-userid-and-gid-groupid-in-5-seconds/
 
-4. **Générez un secret TOTP** :
-   ```bash
-   python3 -c "import pyotp; print(pyotp.random_base32())"
-   ```
-   
-   Utilisez ce secret dans votre application d'authentification (Google Authenticator, Authy, etc.) :
-   ```
-   otpauth://totp/hardlink-ui?secret=VOTRE_SECRET_TOTP&issuer=hardlink-ui
-   ```
+4. **🔐 Générer un secret TOTP (2FA)** :
+Pour activer la double authentification, vous devez fournir un **secret TOTP**.  
+Ce secret permet de générer les codes à 6 chiffres utilisés lors de la connexion.
+
+---
+
+### 🟢 Méthode 1 : Générer un secret via un site web (recommandé)
+
+Utilisez un générateur simple et fiable :
+
+👉 https://randomkeygen.com/totp-secret
+
+1. Ouvrez la page  
+2. Dans **TOTP Secret Generator**, choisissez **32 bytes**  
+3. Copiez la clé Base32 générée  
+4. Collez-la dans votre `docker-compose.yml` :
+
+~~~yaml
+environment:
+  - APP_TOTP_SECRET=VOTRE_SECRET_TOTP
+~~~
+
+---
+
+### 🔵 Méthode 2 : Générer un secret sur Windows (PowerShell)
+
+~~~powershell
+[Convert]::ToBase64String((1..32 | %{ [Byte](Get-Random -Minimum 0 -Maximum 255) }))
+~~~
+
+1. Exécutez la commande  
+2. Copiez la valeur générée  
+3. Collez-la dans `APP_TOTP_SECRET`
+
+---
+
+### 📱 Ajouter le secret dans votre application d’authentification
+
+Compatible avec : Google Authenticator, Authy, Aegis, Bitwarden, etc.
+
+1. Ouvrez votre application 2FA  
+2. Appuyez sur **+**  
+3. Choisissez **Saisir une clé de configuration**  
+4. Renseignez :
+   - **Nom du compte :** `hardlink-ui`
+   - **Clé :** votre secret TOTP  
+   - **Type :** TOTP / Time-based  
+
+---
+
+### 🧩 Optionnel : Ajouter via QR Code
+
+Si vous préférez scanner un QR code, utilisez cette URL :
+
+~~~text
+otpauth://totp/hardlink-ui?secret=VOTRE_SECRET_TOTP&issuer=hardlink-ui
+~~~
+
+Générez ensuite un QR code avec un outil en ligne :
+
+👉 https://www.qr-code-generator.com  
+
+---
+
+### ✔️ Exemple complet dans docker-compose
+
+~~~yaml
+environment:
+  - APP_ADMIN_USER=admin
+  - APP_ADMIN_PASSWORD=VotreMotDePasse
+  - APP_TOTP_SECRET=VOTRE_SECRET_TOTP
+  - APP_SECRET_KEY=VotreCleSecrete
+  - APP_DATA_ROOT=/data
+  - PUID=1026
+  - PGID=100
+~~~
 
 5. **Démarrez l'application** :
    ```bash
