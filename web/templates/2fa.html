@@ -1,0 +1,18 @@
+{{template "base.html" .}}
+
+{{define "content"}}
+<section class="panel" style="max-width:400px;margin:40px auto;">
+    <h2>Vérification 2FA</h2>
+    <p>Entre le code à 6 chiffres de ton application d'authentification.</p>
+    {{if .error}}
+    <div style="color:var(--error);margin-bottom:8px;">{{.error}}</div>
+    {{end}}
+    <form method="post">
+        <div style="margin-bottom:10px;">
+            <label>Code 2FA</label><br>
+            <input type="text" name="code" class="search-box" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" required autofocus autocomplete="one-time-code">
+        </div>
+        <button type="submit" class="btn">Valider</button>
+    </form>
+</section>
+{{end}}

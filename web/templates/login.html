@@ -1,0 +1,21 @@
+{{template "base.html" .}}
+
+{{define "content"}}
+<section class="panel" style="max-width:400px;margin:40px auto;">
+    <h2>Connexion</h2>
+    {{if .error}}
+    <div style="color:var(--error);margin-bottom:8px;">{{.error}}</div>
+    {{end}}
+    <form method="post">
+        <div style="margin-bottom:10px;">
+            <label>Utilisateur</label><br>
+            <input type="text" name="username" class="search-box" required autofocus>
+        </div>
+        <div style="margin-bottom:10px;">
+            <label>Mot de passe</label><br>
+            <input type="password" name="password" class="search-box" required>
+        </div>
+        <button type="submit" class="btn">Connexion</button>
+    </form>
+</section>
+{{end}}

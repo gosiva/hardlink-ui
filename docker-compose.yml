@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  hardlink-ui:
+    image: ghcr.io/gosiva/hardlink-ui:latest
+    container_name: hardlink-ui
+    restart: unless-stopped
+    ports:
+      - "8095:8000"
+    environment:
+      - TZ=Europe/Brussels
+      - APP_SECRET_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      - APP_ADMIN_USER=XXXXXXXXXXX
+      - APP_ADMIN_PASSWORD=XXXXXXXXXXXXXX
+      - APP_TOTP_SECRET=XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      - APP_DATA_ROOT=/data
+      # PUID/PGID for NAS file ownership compatibility (REQUIRED)
+      - PUID=1047
+      - PGID=100
+    volumes:
+      - /volume2/data:/data

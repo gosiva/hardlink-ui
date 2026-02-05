@@ -1,0 +1,78 @@
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 16px;
+}
+
+.login-title {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    color: var(--text);
+}
+
+.login-slogan {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+}
+
+.login-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+}
+
+.login-panel h2 {
+    margin-top: 0;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.login-panel .form-group {
+    margin-bottom: 16px;
+}
+
+.login-panel label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.login-panel input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-panel .btn {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.login-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--error);
+    color: var(--error);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.theme-toggle-login {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+}

@@ -1,0 +1,246 @@
+{{template "base.html" .}}
+
+{{define "content"}}
+<section class="panel">
+
+    <div class="tabs">
+        <button class="tab-button active" data-tab="explorer-tab">Explorateur</button>
+        <button class="tab-button" data-tab="hardlink-tab">Créateur de hardlinks</button>
+        <button class="tab-button" data-tab="doublons-tab">Doublons</button>
+        <button class="tab-button" data-tab="settings-tab">Paramètres</button>
+    </div>
+
+    <!-- 1) EXPLORATEUR -->
+    <div id="explorer-tab" class="tab-content active">
+        <h2>Explorateur de hardlinks</h2>
+
+        <div id="breadcrumb" class="breadcrumb"></div>
+
+        <input id="search" placeholder="Rechercher…" class="search-box">
+
+        <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;">
+            <button id="explorer-delete-toggle" class="btn-secondary small">
+                🗑️ Mode suppression
+            </button>
+            <span id="explorer-delete-status" class="text-muted" style="font-size:12px;display:none;">
+                ⚠️ Mode suppression actif - Cliquez sur un hardlink pour le supprimer
+            </span>
+        </div>
+
+        <div class="explorer-layout">
+            <div class="explorer-list">
+                <table id="fb-table" class="fb-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Nom</th>
+                            <th>Liens</th>
+                            <th>Taille</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="4">Chargement…</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="explorer-details">
+                <div id="details">
+                    Sélectionne un fichier pour voir les détails de hardlinks.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2) CREATEUR DE HARDLINKS -->
+    <div id="hardlink-tab" class="tab-content">
+        <h2>Créateur de hardlinks</h2>
+        <p class="text-muted">
+            Choisis une source (fichiers / dossiers) à gauche, puis un dossier de destination à droite.
+            En mode Multi, tu peux sélectionner plusieurs éléments à traiter en une seule fois.
+        </p>
+
+        <div class="hl-layout">
+
+            <!-- SOURCE -->
+            <div class="hl-column">
+                <div class="hl-header">
+                    <h3>Source</h3>
+                    <div class="mode-toggle">
+                        <span class="mode-label">Sélection :</span>
+                        <div class="switch" id="hl-select-mode">
+                            <span class="switch-option switch-option-active" data-mode="single">Single</span>
+                            <span class="switch-knob"></span>
+                            <span class="switch-option" data-mode="multi">Multi</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="hl-src-breadcrumb" class="breadcrumb small"></div>
+
+                <div class="explorer-list">
+                    <table id="hl-src-table" class="fb-table">
+                        <thead>
+                            <tr>
+                                <th class="col-select"></th>
+                                <th>Nom</th>
+                                <th>Liens</th>
+                                <th>Taille</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="4">Chargement…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="hl-selection">
+                    <strong>Source sélectionnée :</strong>
+                    <span id="hl-src-selected">(aucune)</span>
+                </div>
+            </div>
+
+            <!-- DESTINATION -->
+            <div class="hl-column">
+                <div class="hl-header">
+                    <h3>Destination</h3>
+                    <button id="hl-btn-new-folder" class="btn btn-new-folder small">📁 Nouveau dossier</button>
+                </div>
+                <div id="hl-dest-breadcrumb" class="breadcrumb small"></div>
+
+                <div class="explorer-list">
+                    <table id="hl-dest-table" class="fb-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Nom</th>
+                                <th>Liens</th>
+                                <th>Taille</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="4">Chargement…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="hl-selection">
+                    <strong>Dossier de destination :</strong>
+                    <span id="hl-dest-selected">(racine DATA)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="hl-footer">
+            <button id="hl-btn-create" class="btn">Créer les hardlinks</button>
+        </div>
+    </div>
+
+    <!-- 3) DOUBLONS (fusion Analyse + Doublons) -->
+    <div id="doublons-tab" class="tab-content">
+        <h2>Analyse des doublons</h2>
+        <p class="text-muted">
+            Détection de fichiers réellement identiques (taille + hash rapide) et estimation de l’espace perdu.
+        </p>
+
+        <!-- DASHBOARD -->
+        <div class="dup-dashboard">
+            <div class="dup-card" id="dup-card-groups">
+                <div class="dup-card-title">Groupes de fichiers identiques</div>
+                <div class="dup-card-value">–</div>
+            </div>
+            <div class="dup-card" id="dup-card-files">
+                <div class="dup-card-title">Fichiers doublons</div>
+                <div class="dup-card-value">–</div>
+            </div>
+            <div class="dup-card" id="dup-card-space">
+                <div class="dup-card-title">Espace gaspillé</div>
+                <div class="dup-card-value">–</div>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-top:10px;">
+            <button id="btn-dup-scan" class="btn">🔍 Scanner les doublons</button>
+            <p class="text-muted" style="margin-top:6px;">
+                Le scan peut prendre du temps selon la taille de ton dataset.
+            </p>
+        </div>
+
+        <!-- Actions buttons - OUTSIDE scroll area -->
+        <div id="dup-actions-container" style="display:none;margin-top:10px;margin-bottom:8px;">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <button id="btn-dup-select-all" class="btn-secondary small">✓ Tout sélectionner</button>
+                <button id="btn-dup-deselect-all" class="btn-secondary small" style="display:none;">✗ Tout désélectionner</button>
+                <button id="btn-dup-convert" class="btn-danger">🔗 Convertir en hardlinks</button>
+            </div>
+            <p class="text-muted" style="margin-top:4px;font-size:12px;">
+                Attention : la conversion est irréversible. Les doublons seront remplacés par des hardlinks.
+            </p>
+        </div>
+
+        <div class="panel panel-scroll" style="margin-top:10px;max-height:320px;">
+            <h3>Doublons détectés</h3>
+
+            <div id="dup-summary" class="text-muted" style="margin-top:8px;margin-bottom:8px;">
+                Lance un scan pour analyser les doublons.
+            </div>
+
+            <table id="dup-table" class="fb-table" style="margin-top:8px;">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Taille</th>
+                        <th>Fichier principal</th>
+                        <th>Doublons</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4">Aucun scan lancé.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 4) PARAMÈTRES -->
+    <div id="settings-tab" class="tab-content">
+        <h2>Paramètres</h2>
+
+        <div class="panel" style="margin-top:10px;">
+            <h3>Nom de la racine</h3>
+            <input id="root-label-input" class="search-box" placeholder="Ex: DATA, NAS, STORAGE">
+            <button id="root-label-save" class="btn small" style="margin-top:6px;">Enregistrer</button>
+            <p class="text-muted" style="margin-top:4px;">
+                Ce nom remplace "/" dans le breadcrumb (ex: DATA › Series › ...).
+            </p>
+        </div>
+
+        <div class="panel" style="margin-top:10px;">
+            <h3>Niveau de journalisation</h3>
+            <div style="display:flex;gap:8px;margin-top:6px;">
+                <button id="log-level-minimal" class="btn-secondary small">Minimal</button>
+                <button id="log-level-debug" class="btn-secondary small">Debug</button>
+                <button id="log-level-trace" class="btn-secondary small">Trace</button>
+            </div>
+            <p class="text-muted" style="margin-top:4px;">
+                <strong>Minimal</strong>: uniquement les messages importants.<br>
+                <strong>Debug</strong>: affiche plus de détails pour le débogage.<br>
+                <strong>Trace</strong>: affiche absolument tout (très verbeux).
+            </p>
+        </div>
+
+        <div class="panel" style="margin-top:10px;">
+            <h3>Thème par défaut</h3>
+            <button id="theme-default-dark" class="btn-secondary small">Sombre</button>
+            <button id="theme-default-light" class="btn-secondary small">Clair</button>
+        </div>
+    </div>
+
+</section>
+{{end}}

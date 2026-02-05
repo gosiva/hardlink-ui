@@ -1,0 +1,96 @@
+{{define "base.html"}}
+<!doctype html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>hardlink-ui</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <!-- Thème -->
+    <link rel="stylesheet" href="/static/css/theme.css">
+
+    <!-- Icônes et PWA -->
+    <link rel="icon" href="/static/favicon/favicon.ico">
+    <link rel="apple-touch-icon" href="/static/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="/static/favicon/manifest.json">
+
+    <!-- iOS PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="hardlink-ui">
+    
+    <!-- iOS Splash Screens -->
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/static/favicon/apple-splash-1290x2796.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/static/favicon/apple-splash-1179x2556.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/static/favicon/apple-splash-1284x2778.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/static/favicon/apple-splash-1170x2532.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/static/favicon/apple-splash-1125x2436.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/static/favicon/apple-splash-1242x2688.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/static/favicon/apple-splash-828x1792.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/static/favicon/apple-splash-750x1334.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/static/favicon/apple-splash-640x1136.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/static/favicon/apple-splash-2048x2732.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/static/favicon/apple-splash-1668x2388.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/static/favicon/apple-splash-1668x2224.png">
+    <link rel="apple-touch-startup-image" media="screen and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/static/favicon/apple-splash-1620x2160.png">
+
+    <!-- Couleur thème -->
+    <meta name="theme-color" content="#0b1120">
+    
+    <!-- Android PWA -->
+    <meta name="mobile-web-app-capable" content="yes">
+</head>
+
+<body>
+    <div class="app-container">
+
+        <header class="app-header">
+
+            <a href="/" class="app-logo-link">
+                <img src="/static/img/logo.svg" alt="Logo" class="app-logo">
+            </a>
+
+            <div class="app-title">
+                <a href="/" class="app-title-link">
+                    <h1>hardlink-ui</h1>
+                </a>
+                <div class="app-slogan">
+                    Duplication sans perte d'espace
+                </div>
+            </div>
+
+            <div class="app-header-right">
+                <button id="theme-toggle" class="btn-secondary small">🌙</button>
+                {{if not .isAuthPage}}
+                <a href="/logout" class="btn-secondary small">Déconnexion</a>
+                {{end}}
+            </div>
+
+        </header>
+
+        {{template "content" .}}
+
+        {{if not .isAuthPage}}
+        <footer style="margin-top:16px;">
+            <div id="log-panel"></div>
+        </footer>
+        {{end}}
+
+    </div>
+
+    <!-- Modal overlay for integrated messages -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal-content">
+            <span class="modal-icon"></span>
+            <h3 class="modal-title"></h3>
+            <p class="modal-message"></p>
+            <button class="btn modal-close">OK</button>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+
+</html>
+{{end}}
