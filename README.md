@@ -115,7 +115,7 @@ services:
 
    ---
 
-   *** 🟢 Méthode 1 : Générer un secret via un site web (recommandé) ***
+   #### 🟢 Méthode 1 : Générer un secret via un site web (recommandé)
 
    Utilisez un générateur simple et fiable :
 
@@ -133,7 +133,7 @@ services:
 
    ---
 
-   *** 🔵 Méthode 2 : Générer un secret sur Windows (PowerShell) ***
+   #### 🔵 Méthode 2 : Générer un secret sur Windows (PowerShell)
 
    ~~~powershell
    $bytes = New-Object byte[] 32; (New-Object System.Security.Cryptography.RNGCryptoServiceProvider).GetBytes($bytes); $alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"; $output = ""; $buffer = 0; $bitsLeft = 0; foreach ($b in $bytes) { $buffer = ($buffer -shl 8) -bor $b; $bitsLeft += 8; while ($bitsLeft -ge 5) { $bitsLeft -= 5; $output += $alphabet[($buffer -shr $bitsLeft) -band 31]; } }; if ($bitsLeft -gt 0) { $output += $alphabet[($buffer -shl (5 - $bitsLeft)) -band 31]; }; $output
@@ -145,7 +145,7 @@ services:
 
    ---
 
-   *** 📱 Ajouter le secret dans votre application d’authentification ***
+   #### 📱 Ajouter le secret dans votre application d’authentification
 
    Compatible avec : Google Authenticator, Authy, Aegis, Bitwarden, etc.
 
@@ -159,7 +159,7 @@ services:
 
    ---
 
-   *** 🧩 Optionnel : Ajouter via QR Code ***
+   #### 🧩 Optionnel : Ajouter via QR Code
 
    Si vous préférez scanner un QR code, utilisez cette URL :
 
@@ -520,7 +520,7 @@ L'application fonctionnera en mode standalone avec sa propre icône.
 
 ---
 
-## 🔧 Troubleshooting
+## 🛠️ Troubleshooting
 
 ### Problème : "Permission denied" lors de la création de hardlinks
 
