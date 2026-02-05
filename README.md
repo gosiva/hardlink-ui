@@ -4,32 +4,33 @@
   <img src="https://img.shields.io/badge/☕_Offrir_un_café-FFDD00?style=for-the-badge&logo=paypal&logoColor=003087" />
 </a>
 
-**Interface web moderne pour gérer les hardlinks sur votre NAS ou serveur de stockage.**
-
-Dupliquons sans perdre de place. 🚀
+**Interface web moderne pour gérer les hardlinks sur votre NAS ou serveur de stockage.**  
+Dupliquez sans perdre de place. 🚀
 
 ---
 
 ## 📚 Sommaire
 
 - [📖 Présentation](#-présentation)
-- [🚀 Démarrage rapide](#-démarrage-rapide-débutants)
-  - [Prérequis](#1-prérequis)
-  - [Configuration docker-compose](#2-configuration-rapide-avec-docker-compose)
-  - [Trouver PUID/PGID](#3-trouvez-vos-puid-et-pgid-obligatoire-pour-synology)
-  - [Générer un secret TOTP](#-générer-un-secret-totp-2fa)
+- [🚀 Démarrage rapide](#-démarrage-rapide)
+  - [Prérequis](#prérequis)
+  - [Configuration rapide avec docker-compose](#configuration-rapide-avec-docker-compose)
+  - [Trouver PUID/PGID](#trouver-puidpgid)
+  - [Générer un secret TOTP (2FA)](#-générer-un-secret-totp-2fa)
 - [✨ Fonctionnalités](#-fonctionnalités)
-- [📋 Prérequis](#-prérequis)
+- [📋 Prérequis détaillés](#-prérequis-détaillés)
 - [🔧 Installation avancée](#-installation-avancée)
-- [⚙️ Configuration](#-configuration)
+- [⚙️ Configuration](#️-configuration)
 - [🔒 Notes de sécurité](#-notes-de-sécurité)
 - [📱 Guide d’utilisation](#-guide-dutilisation)
 - [📱 Progressive Web App (PWA)](#-progressive-web-app-pwa)
-- [🛠️ Troubleshooting](#-troubleshooting)
+- [🛠️ Troubleshooting](#️-troubleshooting)
 - [❓ FAQ](#-faq)
 - [📄 Licence](#-licence)
 - [🤝 Contribution](#-contribution)
 - [📞 Support](#-support)
+
+---
 
 ## 📖 Présentation
 
@@ -48,16 +49,16 @@ Les hardlinks permettent à plusieurs chemins de pointer vers le même fichier p
 
 ---
 
-## 🚀 Démarrage rapide (débutants)
+## 🚀 Démarrage rapide
 
 La méthode la plus simple pour commencer avec **hardlink-ui** sur votre NAS Synology :
 
-### 1. Prérequis
+### Prérequis
 
 - **Docker** installé sur votre Synology (via Package Center)
 - Accès SSH ou Container Manager sur votre Synology
 
-### 2. Configuration rapide avec docker-compose
+### Configuration rapide avec docker-compose
 
 1. **Créez un dossier** pour hardlink-ui sur votre NAS (par exemple `/volume1/docker/hardlink-ui`)
 
@@ -87,7 +88,7 @@ services:
       - /volume1/data:/data  # Changez selon votre volume
 ```
 
-### 3. Trouver vos PUID et PGID (OBLIGATOIRE pour Synology)
+### Trouver PUID/PGID
 
    Sur votre Synology, en SSH :
    ```bash
@@ -107,7 +108,7 @@ services:
    
    **Guide détaillé Synology :** https://mariushosting.com/synology-find-uid-userid-and-gid-groupid-in-5-seconds/
 
-### 4. 🔐 Générer un secret TOTP (2FA)
+### 🔐 Générer un secret TOTP (2FA)
 
 Pour activer la double authentification, vous devez fournir un **secret TOTP**.  
 Ce secret permet de générer les codes à 6 chiffres utilisés lors de la connexion.
@@ -248,7 +249,7 @@ L'interface s'adapte automatiquement aux différentes tailles d'écran :
 
 ---
 
-## 📋 Prérequis
+## 📋 Prérequis détaillés
 
 - **Docker** et **Docker Compose** installés sur votre système
 - Un système de fichiers supportant les hardlinks (ext4, btrfs, xfs, etc.)
