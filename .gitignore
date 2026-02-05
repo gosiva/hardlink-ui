@@ -1,6 +1,7 @@
 # Binaries
 hardlink-ui
-#server
+/server
+/server.exe
 *.exe
 *.dll
 *.so
