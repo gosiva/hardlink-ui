@@ -134,7 +134,7 @@ environment:
 ### 🔵 Méthode 2 : Générer un secret sur Windows (PowerShell)
 
 ~~~powershell
-[Convert]::ToBase64String((1..32 | %{ [Byte](Get-Random -Minimum 0 -Maximum 255) }))
+-join ((1..64) | ForEach-Object { "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".ToCharArray() | Get-Random })
 ~~~
 
 1. Exécutez la commande  
@@ -162,7 +162,7 @@ Compatible avec : Google Authenticator, Authy, Aegis, Bitwarden, etc.
 Si vous préférez scanner un QR code, utilisez cette URL :
 
 ~~~text
-otpauth://totp/hardlink-ui?secret=VOTRE_SECRET_TOTP&issuer=hardlink-ui
+otpauth://totp/username?secret=VOTRE_SECRET_TOTP&issuer=hardlink-ui
 ~~~
 
 Générez ensuite un QR code avec un outil en ligne :
