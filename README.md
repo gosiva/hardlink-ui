@@ -110,70 +110,70 @@ services:
 
 ### 🔐 Générer un secret TOTP (2FA)
 
-Pour activer la double authentification, vous devez fournir un **secret TOTP**.  
-Ce secret permet de générer les codes à 6 chiffres utilisés lors de la connexion.
+   Pour activer la double authentification, vous devez fournir un **secret TOTP**.  
+   Ce secret permet de générer les codes à 6 chiffres utilisés lors de la connexion.
 
----
+   ---
 
-### 🟢 Méthode 1 : Générer un secret via un site web (recommandé)
+   *** 🟢 Méthode 1 : Générer un secret via un site web (recommandé) ***
 
-Utilisez un générateur simple et fiable :
+   Utilisez un générateur simple et fiable :
 
-👉 https://randomkeygen.com/totp-secret
+   👉 https://randomkeygen.com/totp-secret
 
-1. Ouvrez la page  
-2. Dans **TOTP Secret Generator**, choisissez **32 bytes**  
-3. Copiez la clé Base32 générée  
-4. Collez-la dans votre `docker-compose.yml` :
+   1. Ouvrez la page  
+   2. Dans **TOTP Secret Generator**, choisissez **32 bytes**  
+   3. Copiez la clé Base32 générée  
+   4. Collez-la dans votre `docker-compose.yml` :
 
-~~~yaml
-environment:
-  - APP_TOTP_SECRET=VOTRE_SECRET_TOTP
-~~~
+   ~~~yaml
+   environment:
+   - APP_TOTP_SECRET=VOTRE_SECRET_TOTP
+   ~~~
 
----
+   ---
 
-### 🔵 Méthode 2 : Générer un secret sur Windows (PowerShell)
+   *** 🔵 Méthode 2 : Générer un secret sur Windows (PowerShell) ***
 
-~~~powershell
-$bytes = New-Object byte[] 32; (New-Object System.Security.Cryptography.RNGCryptoServiceProvider).GetBytes($bytes); $alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"; $output = ""; $buffer = 0; $bitsLeft = 0; foreach ($b in $bytes) { $buffer = ($buffer -shl 8) -bor $b; $bitsLeft += 8; while ($bitsLeft -ge 5) { $bitsLeft -= 5; $output += $alphabet[($buffer -shr $bitsLeft) -band 31]; } }; if ($bitsLeft -gt 0) { $output += $alphabet[($buffer -shl (5 - $bitsLeft)) -band 31]; }; $output
-~~~
+   ~~~powershell
+   $bytes = New-Object byte[] 32; (New-Object System.Security.Cryptography.RNGCryptoServiceProvider).GetBytes($bytes); $alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"; $output = ""; $buffer = 0; $bitsLeft = 0; foreach ($b in $bytes) { $buffer = ($buffer -shl 8) -bor $b; $bitsLeft += 8; while ($bitsLeft -ge 5) { $bitsLeft -= 5; $output += $alphabet[($buffer -shr $bitsLeft) -band 31]; } }; if ($bitsLeft -gt 0) { $output += $alphabet[($buffer -shl (5 - $bitsLeft)) -band 31]; }; $output
+   ~~~
 
-1. Exécutez la commande  
-2. Copiez la valeur générée  
-3. Collez-la dans `APP_TOTP_SECRET`
+   1. Exécutez la commande  
+   2. Copiez la valeur générée  
+   3. Collez-la dans `APP_TOTP_SECRET`
 
----
+   ---
 
-### 📱 Ajouter le secret dans votre application d’authentification
+   *** 📱 Ajouter le secret dans votre application d’authentification ***
 
-Compatible avec : Google Authenticator, Authy, Aegis, Bitwarden, etc.
+   Compatible avec : Google Authenticator, Authy, Aegis, Bitwarden, etc.
 
-1. Ouvrez votre application 2FA  
-2. Appuyez sur **+**  
-3. Choisissez **Saisir une clé de configuration**  
-4. Renseignez :
-   - **Nom du compte :** `hardlink-ui`
-   - **Clé :** votre secret TOTP  
-   - **Type :** TOTP / Time-based  
+   1. Ouvrez votre application 2FA  
+   2. Appuyez sur **+**  
+   3. Choisissez **Saisir une clé de configuration**  
+   4. Renseignez :
+      - **Nom du compte :** `hardlink-ui`
+      - **Clé :** votre secret TOTP  
+      - **Type :** TOTP / Time-based  
 
----
+   ---
 
-### 🧩 Optionnel : Ajouter via QR Code
+   *** 🧩 Optionnel : Ajouter via QR Code ***
 
-Si vous préférez scanner un QR code, utilisez cette URL :
+   Si vous préférez scanner un QR code, utilisez cette URL :
 
-~~~text
-otpauth://totp/username?secret=VOTRE_SECRET_TOTP&issuer=hardlink-ui
-~~~
+   ~~~text
+   otpauth://totp/username?secret=VOTRE_SECRET_TOTP&issuer=hardlink-ui
+   ~~~
 
-Modifier "username" par le Login que vous avez configurer !
+   Modifier "username" par le Login que vous avez configurer !
 
-Générez ensuite un QR code avec un outil en ligne :
+   Générez ensuite un QR code avec un outil en ligne :
 
-👉 https://www.qr-code-generator.com  
+   👉 https://www.qr-code-generator.com  
 
----
+   ---
 
 ### ✔️ Exemple complet dans docker-compose
 
