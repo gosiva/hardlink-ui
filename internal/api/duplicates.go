@@ -60,11 +60,9 @@ func (h *DuplicatesHandler) StartScan(w http.ResponseWriter, r *http.Request) {
 func (h *DuplicatesHandler) GetProgress(w http.ResponseWriter, r *http.Request) {
     jobID := r.URL.Query().Get("job_id")
     if jobID == "" {
-        // Try path parameter
         parts := strings.Split(r.URL.Path, "/")
         if len(parts) > 0 {
             lastPart := parts[len(parts)-1]
-            // Only use path parameter if it's not "progress" (the endpoint name)
             if lastPart != "" && lastPart != "progress" {
                 jobID = lastPart
             }
@@ -76,26 +74,21 @@ func (h *DuplicatesHandler) GetProgress(w http.ResponseWriter, r *http.Request) 
         return
     }
 
-    // Get username and remote address for logging
     username := GetUsername(r)
     remoteAddr := r.RemoteAddr
 
-    // Verify job exists before starting SSE stream
     progress := h.scanner.GetProgress(jobID)
     if progress == nil {
         JSONError(w, http.StatusNotFound, "Job not found")
         return
     }
 
-    // Set SSE headers - critical for reverse proxy compatibility
     w.Header().Set("Content-Type", "text/event-stream; charset=utf-8")
     w.Header().Set("Cache-Control", "no-cache, no-transform")
     w.Header().Set("Connection", "keep-alive")
-    w.Header().Set("X-Accel-Buffering", "no")      // Disable nginx buffering
-    w.Header().Set("Content-Encoding", "identity") // Avoid proxy compression
+    w.Header().Set("X-Accel-Buffering", "no")
+    w.Header().Set("Content-Encoding", "identity")
 
-    // For SSE to work behind reverse proxies (e.g., Synology), we need proper CORS headers
-    // but only for same-origin or localhost requests (security)
     origin := r.Header.Get("Origin")
     if origin != "" && isAllowedOrigin(origin, r.Host) {
         w.Header().Set("Access-Control-Allow-Origin", origin)
@@ -111,20 +104,17 @@ func (h *DuplicatesHandler) GetProgress(w http.ResponseWriter, r *http.Request) 
 
     log.Printf("SSE CONNECT job=%s user=%s remote=%s flusher=YES", jobID, username, remoteAddr)
 
-    // Send immediate initial ping comment frame to ensure early bytes for reverse proxy
     fmt.Fprintf(w, ": ping\n\n")
     flusher.Flush()
 
-    // Send initial connected event immediately to confirm SSE connection
     connectedEvent := fmt.Sprintf("event: connected\ndata: {\"job_id\": \"%s\"}\n\n", jobID)
     fmt.Fprint(w, connectedEvent)
     flusher.Flush()
-    log.Printf("SSE SENT job=%s event=connected bytes=%d", jobID, len(connectedEvent))
 
     ticker := time.NewTicker(500 * time.Millisecond)
     defer ticker.Stop()
 
-    heartbeatTicker := time.NewTicker(15 * time.Second) // Heartbeat every 15 seconds
+    heartbeatTicker := time.NewTicker(15 * time.Second)
     defer heartbeatTicker.Stop()
 
     timeout := time.After(10 * time.Minute)
@@ -139,7 +129,6 @@ func (h *DuplicatesHandler) GetProgress(w http.ResponseWriter, r *http.Request) 
             if progress == nil {
                 fmt.Fprintf(w, "event: error\ndata: {\"error\": \"Job not found\"}\n\n")
                 flusher.Flush()
-                log.Printf("SSE ERROR job=%s error=job_not_found", jobID)
                 return
             }
 
@@ -148,67 +137,51 @@ func (h *DuplicatesHandler) GetProgress(w http.ResponseWriter, r *http.Request) 
             flusher.Flush()
             eventCount++
 
-            // Log only when status changes to reduce log noise
             if progress.Status != lastProgressStatus {
-                log.Printf("SSE SENT job=%s event=progress status=%s processed=%d total=%d bytes=%d events=%d",
-                    jobID, progress.Status, progress.Processed, progress.TotalFiles, len(data), eventCount)
+                log.Printf("SSE SENT job=%s event=progress status=%s processed=%d total=%d",
+                    jobID, progress.Status, progress.Processed, progress.TotalFiles)
                 lastProgressStatus = progress.Status
             }
 
-            // If completed or failed, close the stream
             if progress.Status == "completed" || progress.Status == "failed" {
-                log.Printf("SSE DISCONNECT job=%s status=%s events_sent=%d", jobID, progress.Status, eventCount)
+                log.Printf("SSE DISCONNECT job=%s status=%s", jobID, progress.Status)
                 return
             }
 
         case <-heartbeatTicker.C:
-            // Send periodic heartbeat comment to keep connection alive
             fmt.Fprintf(w, ": heartbeat\n\n")
             flusher.Flush()
-            log.Printf("SSE HEARTBEAT job=%s events=%d", jobID, eventCount)
 
         case <-timeout:
             fmt.Fprintf(w, "event: timeout\ndata: {\"error\": \"Timeout\"}\n\n")
             flusher.Flush()
-            log.Printf("SSE TIMEOUT job=%s events_sent=%d", jobID, eventCount)
             return
 
         case <-r.Context().Done():
-            log.Printf("SSE DISCONNECT job=%s reason=client_disconnect events_sent=%d", jobID, eventCount)
             return
         }
     }
 }
 
-// isAllowedOrigin checks if the origin is allowed for CORS
-// This allows same-origin requests and localhost for development
 func isAllowedOrigin(origin, host string) bool {
-    // Parse origin to get host
-    // Origin format: scheme://host:port
     if strings.HasPrefix(origin, "http://"+host) || strings.HasPrefix(origin, "https://"+host) {
         return true
     }
-
-    // Allow localhost for development (any port)
     if strings.HasPrefix(origin, "http://localhost") || strings.HasPrefix(origin, "https://localhost") {
         return true
     }
     if strings.HasPrefix(origin, "http://127.0.0.1") || strings.HasPrefix(origin, "https://127.0.0.1") {
         return true
     }
-
     return false
 }
-
 // GetResults returns the results of a completed scan
 func (h *DuplicatesHandler) GetResults(w http.ResponseWriter, r *http.Request) {
     jobID := r.URL.Query().Get("job_id")
     if jobID == "" {
-        // Try path parameter
         parts := strings.Split(r.URL.Path, "/")
         if len(parts) > 0 {
             lastPart := parts[len(parts)-1]
-            // Only use path parameter if it's not "results" (the endpoint name)
             if lastPart != "" && lastPart != "results" {
                 jobID = lastPart
             }
@@ -252,7 +225,7 @@ func (h *DuplicatesHandler) ConvertDuplicates(w http.ResponseWriter, r *http.Req
         return
     }
 
-    // Read PUID/PGID from environment (for container-friendly ownership)
+    // Read PUID/PGID from environment
     uidStr := os.Getenv("PUID")
     gidStr := os.Getenv("PGID")
     uid, _ := strconv.Atoi(uidStr)
@@ -288,7 +261,7 @@ func (h *DuplicatesHandler) ConvertDuplicates(w http.ResponseWriter, r *http.Req
             continue
         }
 
-        // Normalize master permissions if PUID/PGID are set
+        // Normalize master permissions
         if uid > 0 && gid > 0 {
             _ = os.Chown(masterPath, uid, gid)
             _ = os.Chmod(masterPath, 0o644)
@@ -315,7 +288,7 @@ func (h *DuplicatesHandler) ConvertDuplicates(w http.ResponseWriter, r *http.Req
 
             size := otherInfo.Size()
 
-            // Normalize duplicate permissions if PUID/PGID are set
+            // Normalize duplicate permissions
             if uid > 0 && gid > 0 {
                 _ = os.Chown(otherPath, uid, gid)
                 _ = os.Chmod(otherPath, 0o644)
@@ -336,34 +309,24 @@ func (h *DuplicatesHandler) ConvertDuplicates(w http.ResponseWriter, r *http.Req
             // Create a temporary hardlink path
             tmpPath := otherPath + ".tmp-hardlink"
 
-            // 1. Try to create hardlink at temporary location
+            // 1. Create temporary hardlink
             if err := os.Link(masterPath, tmpPath); err != nil {
                 errors = append(errors, fmt.Sprintf("%s: failed to create temporary hardlink: %v", otherRel, err))
                 continue
             }
 
-            // 2. Fix permissions on temporary hardlink if PUID/PGID are set
-            if uid > 0 && gid > 0 {
-                if err := os.Chown(tmpPath, uid, gid); err != nil {
-                    // rollback
-                    _ = os.Remove(tmpPath)
-                    errors = append(errors, fmt.Sprintf("%s: failed to chown temporary hardlink: %v", otherRel, err))
-                    continue
-                }
-                _ = os.Chmod(tmpPath, 0o644)
-            }
+            // ❌ DO NOT CHOWN THE HARDLINK — impossible and useless
+            // It shares the inode with master, so permissions come from master.
 
-            // 3. If hardlink OK → remove the original duplicate
+            // 2. Remove original duplicate
             if err := os.Remove(otherPath); err != nil {
-                // rollback: remove temp hardlink
                 _ = os.Remove(tmpPath)
                 errors = append(errors, fmt.Sprintf("%s: failed to remove original file: %v", otherRel, err))
                 continue
             }
 
-            // 4. Rename temporary hardlink to original filename
+            // 3. Rename temporary hardlink to original filename
             if err := os.Rename(tmpPath, otherPath); err != nil {
-                // rollback: best effort cleanup
                 _ = os.Remove(tmpPath)
                 errors = append(errors, fmt.Sprintf("%s: failed to rename temporary hardlink: %v", otherRel, err))
                 continue
